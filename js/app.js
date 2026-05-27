@@ -3127,15 +3127,33 @@ function initWsCodeTab() {
   });
 
   // Export (download code file) button
-  document.getElementById('btn-ws-export')?.addEventListener('click', () => {
+  document.getElementById('btn-ws-export')?.addEventListener('click', async () => {
     const code = document.getElementById('ws-code-output')?.textContent || '';
-    const ext  = activeLang === 'javascript' ? 'js' : 'py';
-    const blob = new Blob([code], { type: 'text/plain;charset=utf-8' });
-    const a    = document.createElement('a');
-    a.href     = URL.createObjectURL(blob);
-    a.download = `toio-program.${ext}`;
-    a.click();
-    log(`${activeLang === 'javascript' ? 'JavaScript' : 'Python'} ${t('ui.save')} OK`, 'info');
+    if (activeLang === 'javascript') {
+      // JS: single .js file
+      const blob = new Blob([code], { type: 'text/plain;charset=utf-8' });
+      const a    = document.createElement('a');
+      a.href     = URL.createObjectURL(blob);
+      a.download = 'toio-program.js';
+      a.click();
+      log(`JavaScript ${t('ui.save')} OK`, 'info');
+    } else {
+      // Python: ZIP with main.py + toio_helpers.py + README.txt
+      if (typeof JSZip === 'undefined') {
+        log('JSZip not loaded — cannot create ZIP', 'error');
+        return;
+      }
+      const zip = new JSZip();
+      zip.file('main.py',         code);
+      zip.file('toio_helpers.py', buildPythonHelpers());
+      zip.file('README.txt',      buildPythonReadme());
+      const blob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
+      const a    = document.createElement('a');
+      a.href     = URL.createObjectURL(blob);
+      a.download = 'toio-program.zip';
+      a.click();
+      log(`Python ZIP ${t('ui.save')} OK  (main.py + toio_helpers.py + README.txt)`, 'info');
+    }
   });
 
   // HTML save button (JS only)

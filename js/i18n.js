@@ -35,7 +35,7 @@ const LANGS = {
     'ui.python':      '疑似Python',
     'ui.downloadHtml': 'HTML保存',
     'ui.exportJs':    'JS保存',
-    'ui.exportPy':    '疑似Python保存',
+    'ui.exportPy':    'Python ZIP',
     'ui.runLog':      '実行ログ',
 
     // Project name
@@ -371,7 +371,7 @@ const LANGS = {
     'ui.python':      'Pseudo-Python',
     'ui.downloadHtml': 'Save HTML',
     'ui.exportJs':    'Save JS',
-    'ui.exportPy':    'Save Pseudo-Python',
+    'ui.exportPy':    'Python ZIP',
     'ui.runLog':      'Run Log',
 
     'ui.projectName': 'Enter project name',
@@ -688,7 +688,7 @@ const LANGS = {
     'ui.python':      '伪Python',
     'ui.downloadHtml': '保存HTML',
     'ui.exportJs':    '保存JS',
-    'ui.exportPy':    '保存伪Python',
+    'ui.exportPy':    'Python ZIP',
     'ui.runLog':      '运行日志',
 
     'ui.projectName': '请输入项目名称',
