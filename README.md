@@ -1,10 +1,11 @@
 # Code Maker for toio™
 
-> **ブラウザだけで動く** toio ビジュアルプログラミング IDE。  
-> Scratch 風のブロックでコーディングし、WebBluetooth でリアルタイムに toio キューブを制御できます。
+**ブラウザだけで動く** toio ビジュアルプログラミング IDE。  
+Scratch 風のブロックでコーディングし、WebBluetooth でリアルタイムに toio キューブを制御できます。
+> すぐに試したい方はこちら：`https://akichika.github.io/code-maker-for-toio/`
 
-<!-- SCREENSHOT: docs/screenshots/overview.png -->
-> *(ここに全体スクリーンショットを追加予定)*
+
+![Overview](docs/screenshots/overview.png)
 
 ---
 
@@ -26,25 +27,15 @@
 
 ## 画面構成 / UI Layout
 
-```
-┌────────────────────────────────────────────────────────────────────┐
-│  Header: ロゴ  [+キューブ接続]  [☀] [🌐] プロジェクト名  [保存][読込][実行][停止]  │
-├──────────────────────┬─────────────────────────────┬───────────────┤
-│                      │                             │               │
-│  Blockly             │  シミュレーター             │  コード / AI  │
-│  ワークスペース      │  (2D トップビュー)          │  コンソール   │
-│                      │                             │               │
-│  ← ドラッグでリサイズ →                           ← リサイズ →   │
-└──────────────────────┴─────────────────────────────┴───────────────┘
-```
+![Overview](docs/screenshots/overview.png)
 
----
 
 ## スクリーンショット / Screenshots
 
-### ① Blockly ワークスペース
+### ① ビジュアルプログラミング ワークスペース
 
 <!-- SCREENSHOT: docs/screenshots/blockly_workspace.png -->
+![Visual Programming](docs/screenshots/blockly_workspace.png)
 
 ブロックをドラッグ＆ドロップで組み合わせてプログラムを作成します。  
 カテゴリは**動き・LED・サウンド・制御・センサー・出力**の 6 種類。
@@ -53,18 +44,18 @@
 
 ### ② 2D シミュレーター
 
-<!-- SCREENSHOT: docs/screenshots/simulator.png -->
+![Simulator](docs/screenshots/simulator.png)
 
 - **簡易プレイマット (A3)**: 座標 (98, 142)〜(402, 358)
 - **トイコレマット(表)**: 座標 (45, 45)〜(455, 455)
 - **カスタムマット**: 任意の座標範囲を登録可能
-- 全画面表示ボタンで大画面確認も可能
+- 全画面表示も可能
 
 ---
 
 ### ③ カードスキャナー
 
-<!-- SCREENSHOT: docs/screenshots/card_scanner.png -->
+![Card Scanner](docs/screenshots/card_scanner.png)
 
 toio Playground Command カードをカメラや画像ファイルで読み取り、Blockly ブロックに自動変換します。
 
@@ -94,7 +85,7 @@ LLM の視覚能力で高精度なカード認識を実現。
 
 ### ④ AI コード生成タブ
 
-<!-- SCREENSHOT: docs/screenshots/ai_tab.png -->
+![AI Code Gen](docs/screenshots/ai_tab.png)
 
 日本語の指示を入力すると Blockly ワークスペースを AI が自動更新します。  
 API キーは設定ダイアログから入力（ブラウザのローカルストレージに保存）。
@@ -103,7 +94,7 @@ API キーは設定ダイアログから入力（ブラウザのローカルス�
 
 ### ⑤ コード表示
 
-<!-- SCREENSHOT: docs/screenshots/code_view.png -->
+![Code View](docs/screenshots/code_view.png)
 
 - **JavaScript**: ブロックから生成されたコードをリアルタイム表示・編集
 - **疑似 Python**: 学習用 Python 風コードを出力
@@ -114,7 +105,7 @@ API キーは設定ダイアログから入力（ブラウザのローカルス�
 
 ### ⑥ テーマ
 
-<!-- SCREENSHOT: docs/screenshots/themes.png -->
+![Dark Mode](docs/screenshots/themes.png)
 
 ヘッダー右上の `☀` ボタンで切替:  
 **ライト** → **ダーク** → **ハイコントラスト** → ライト…
@@ -137,6 +128,8 @@ API キーは設定ダイアログから入力（ブラウザのローカルス�
 ---
 
 ## 使い方 / Quick Start
+
+すぐに試したい方はこちら：`https://akichika.github.io/code-maker-for-toio/`
 
 ### 1. ローカルサーバーの起動
 
@@ -345,15 +338,15 @@ CSS/JS の変更は `index.html` 内の `?v=N` バージョン番号を上げて
 
 [MIT License](LICENSE)
 
-Copyright (c) 2025 akichika
+Copyright (c) 2026 akichika
 
 ---
 
 ## 免責 / Disclaimer
 
-- **toio™** は株式会社ソニー・インタラクティブエンタテインメントの商標です。
+- **toio™** は株式会社ソニー・インタラクティブエンタテインメントの商標または登録商標です。
 - このプロジェクトは非公式のファンメイドツールです。ソニー・インタラクティブエンタテインメントとは無関係です。
-- **toio Playground Command** は株式会社ソニー・インタラクティブエンタテインメントの製品です。
+- **トイオ・プレイグラウンド コマンド** は株式会社ソニー・インタラクティブエンタテインメントの製品です。
 - AI 機能の利用には各 API プロバイダー (Google / OpenAI / Anthropic) の利用規約が適用されます。
 
 ---
@@ -361,6 +354,6 @@ Copyright (c) 2025 akichika
 ## 関連リンク / Links
 
 - [toio 公式サイト](https://toio.io)
-- [toio Playground Command](https://toio.io/products/playground-command.html)
+- [トイオ・プレイグラウンド コマンド](https://toio.io/titles/pg-cmd.html)
 - [Blockly](https://developers.google.com/blockly)
 - [Web Bluetooth API (MDN)](https://developer.mozilla.org/docs/Web/API/Web_Bluetooth_API)
