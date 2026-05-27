@@ -2209,8 +2209,9 @@ function _tryPreExpandJS(code) {
     if (!t) { li++; continue; }
 
     // for (let/var/const VAR = START; VAR < ARRNAME.length; VAR++) {
+    // Note: allow optional spaces around the dot (e.g. "pts. length" from LLM output)
     const forM = t.match(
-      /^for\s*\(\s*(?:let|var|const)\s+(\w+)\s*=\s*(\d+)\s*;\s*\w+\s*<\s*(\w+)\.length\s*;\s*\w+\+\+\s*\)\s*\{$/
+      /^for\s*\(\s*(?:let|var|const)\s+(\w+)\s*=\s*(\d+)\s*;\s*\w+\s*[<]=?\s*(\w+)\s*\.\s*length\s*;\s*\w+\+\+\s*\)\s*\{$/
     );
     if (forM && forM[3] in vars) {
       const loopVar  = forM[1];
@@ -2599,10 +2600,11 @@ async function sendLLMMessage() {
   input.value = '';
   addLLMMessage('user', text);
 
-  // Apply code style if buildSystemPrompt is available
+  // Apply code style + current mat context if buildSystemPrompt is available
   const styleEl = document.getElementById('llm-code-style');
   if (styleEl && typeof window.buildSystemPrompt === 'function') {
-    llmClient._systemPromptOverride = window.buildSystemPrompt(styleEl.value);
+    const matCfg = (typeof sim !== 'undefined' && sim._matCfg) ? sim._matCfg : null;
+    llmClient._systemPromptOverride = window.buildSystemPrompt(styleEl.value, matCfg);
   }
 
   const btn = document.getElementById('btn-llm-send');

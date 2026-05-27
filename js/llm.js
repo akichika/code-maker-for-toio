@@ -61,8 +61,9 @@ const _BLOCK_RULES = `
 
 ### 許可事項（OK）
 - **数値リテラルのみ** をAPI引数に使う: \`moveTo(250, 300, null, 80, 'POS_ONLY')\`
-- **座標配列リテラル**: \`const pts = [[x,y],[x,y],...]\` で宣言し、インデックスでアクセス
-- **配列ループ**: \`for (let i = 0; i < pts.length; i++)\` のみ使用可
+- **逐次 moveTo 列挙**（推奨）: 各点を 1行ずつ書く ← **ブロックと完全一致**
+- **座標配列リテラル**（代替）: \`const pts = [[x,y],[x,y],...]\` で宣言し、インデックスでアクセス
+  - 配列ループ: \`for (let i = 0; i < pts.length; i++)\` — **必ず \`pts.length\`（スペースなし）**
 - **繰り返し**: \`for (let i = 0; i < N; i++)\` (Nは数値リテラル)
 
 ### Blocklyブロック対応表（必須）
@@ -76,9 +77,18 @@ const _BLOCK_RULES = `
 **形を描くときは必ず \`'POS_ONLY'\` 形式を使うこと。**
 
 ### 多角形・星形などの複雑な形状
-座標を頭の中で計算し、**数値リテラルの2次元配列**として書くこと:
+**推奨: 各点を1行ずつ書く（ブロックに直接変換される）**
 \`\`\`javascript
-// 五角形の例（座標を直接書く、POS_ONLYで形を描く）
+// 五角形の例（推奨: 逐次書き — 各行がブロック1個に対応）
+await toio[0].moveTo(250, 150, null, 80, 'POS_ONLY');
+await toio[0].moveTo(334, 209, null, 80, 'POS_ONLY');
+await toio[0].moveTo(305, 300, null, 80, 'POS_ONLY');
+await toio[0].moveTo(195, 300, null, 80, 'POS_ONLY');
+await toio[0].moveTo(166, 209, null, 80, 'POS_ONLY');
+await toio[0].moveTo(250, 150, null, 80, 'POS_ONLY');
+\`\`\`
+配列形式（代替）: **必ず \`pts.length\`（ドットの前後にスペースなし）**:
+\`\`\`javascript
 const pts = [[250,150],[334,209],[305,300],[195,300],[166,209]];
 await toio[0].moveTo(pts[0][0], pts[0][1], null, 80, 'POS_ONLY');
 for (let i = 1; i < pts.length; i++) {
@@ -120,6 +130,7 @@ await toio[0].stop();
 const SYSTEM_PROMPT_POSITION = `あなたはtoioロボットを制御するJavaScriptコードを生成するAIアシスタントです。
 ユーザーの指示を受け取り、実行可能なJavaScriptコードを生成してください。
 ${_API_REF}
+/* <<MAT_CONTEXT>> */
 
 ## 移動スタイル: 座標ベース（位置指定）
 
@@ -141,12 +152,11 @@ await toio[0].moveTo(200, 200, null, 80, 'POS_ONLY');
 
 「三角形を描く」→
 \`\`\`javascript
-const pts = [[250,170],[330,310],[170,310]];
-await toio[0].moveTo(pts[0][0], pts[0][1], null, 80, 'POS_ONLY');
-for (let i = 1; i < pts.length; i++) {
-    await toio[0].moveTo(pts[i][0], pts[i][1], null, 80, 'POS_ONLY');
-}
-await toio[0].moveTo(pts[0][0], pts[0][1], null, 80, 'POS_ONLY');
+// 各点を1行ずつ書く（ブロックに直接変換される）
+await toio[0].moveTo(250, 170, null, 80, 'POS_ONLY');
+await toio[0].moveTo(330, 310, null, 80, 'POS_ONLY');
+await toio[0].moveTo(170, 310, null, 80, 'POS_ONLY');
+await toio[0].moveTo(250, 170, null, 80, 'POS_ONLY');
 \`\`\`
 
 「中央に移動して上（北）を向いて止まる」→
@@ -184,6 +194,7 @@ ${_BLOCK_RULES}
 const SYSTEM_PROMPT_TIME = `あなたはtoioロボットを制御するJavaScriptコードを生成するAIアシスタントです。
 ユーザーの指示を受け取り、実行可能なJavaScriptコードを生成してください。
 ${_API_REF}
+/* <<MAT_CONTEXT>> */
 
 ## 移動スタイル: 時間ベース（モーター速度+時間）
 
@@ -248,12 +259,42 @@ ${_BLOCK_RULES_TIME}
 const SYSTEM_PROMPT = SYSTEM_PROMPT_POSITION;
 
 /**
- * Return the appropriate system prompt for the given code style.
- * style: 'time'     → time-based movement (move + duration)
- *        'position' → position-based movement (moveTo with coordinates)
+ * Build the "current mat context" section injected into every system prompt.
+ * Working area = ~70% of each mat dimension centered on the mat → ~half the total area.
+ * @param {object} matCfg  { xMin, yMin, xMax, yMax }
+ * @returns {string} Markdown section for injection, or '' if no matCfg.
  */
-function buildSystemPrompt(style) {
-  return style === 'time' ? SYSTEM_PROMPT_TIME : SYSTEM_PROMPT_POSITION;
+function _buildMatContext(matCfg) {
+  if (!matCfg) return '';
+  const { xMin, yMin, xMax, yMax } = matCfg;
+  const cx  = Math.round((xMin + xMax) / 2);
+  const cy  = Math.round((yMin + yMax) / 2);
+  // ~70% of each dimension centered → area ≈ 49% ≈ 面積の半分
+  const hw  = Math.round((xMax - xMin) * 0.35);
+  const hh  = Math.round((yMax - yMin) * 0.35);
+  const wxMin = cx - hw, wxMax = cx + hw;
+  const wyMin = cy - hh, wyMax = cy + hh;
+  return `
+## 現在のマット設定（必ず参照すること）
+
+使用中マット座標範囲: X=${xMin}〜${xMax}, Y=${yMin}〜${yMax}（中央: ${cx}, ${cy}）
+**推奨移動範囲（面積の約半分）: X=${wxMin}〜${wxMax}, Y=${wyMin}〜${wyMax}**
+
+サイズ・移動範囲の指定がない場合は、上記の推奨移動範囲内で座標を決定すること。
+形のスタート位置も推奨範囲内（中央 ${cx}, ${cy} 付近）に設定すること。
+`;
+}
+
+/**
+ * Return the appropriate system prompt for the given code style.
+ * style:   'time'     → time-based movement (move + duration)
+ *          'position' → position-based movement (moveTo with coordinates)
+ * matCfg:  current mat config { xMin, yMin, xMax, yMax } — injected as coordinate context
+ */
+function buildSystemPrompt(style, matCfg) {
+  const base = style === 'time' ? SYSTEM_PROMPT_TIME : SYSTEM_PROMPT_POSITION;
+  const matSection = _buildMatContext(matCfg);
+  return base.replace('/* <<MAT_CONTEXT>> */', matSection);
 }
 
 window.buildSystemPrompt = buildSystemPrompt;
