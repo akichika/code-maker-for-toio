@@ -65,7 +65,7 @@ const LANGS = {
     'ui.notConnected':'toioが接続されていません。',
     'ui.simMode':     'シミュレーターモードで動作中。実機は「+ キューブ接続」から追加できます。',
     'ui.ready':           'Code Maker for toio™ 起動しました。',
-    'ui.codeOverrideOn':  'JSコードを手動編集中（ブロック・Pythonには反映されません）',
+    'ui.codeOverrideOn':  '直接編集したJSコードを実行します（ブロックへの変換ができませんでした）',
 
     // Cube selector
     'ui.cubeAll':     'すべて',
@@ -245,8 +245,8 @@ const LANGS = {
     'sim3d.hintGrab':  'L-ドラッグ: 移動  R-ドラッグ: 回転  Shift+R-ドラッグ: 傾き  スクロール: 持ち上げ  ダブルクリック: 落下',
 
     // Code edit
-    'ui.codeEditApplied':      'コードを保存しました — 実行ボタンで使用されます',
-    'ui.codeEditClear':        'ブロックに戻す',
+    'ui.codeEditApplied':      'JSコードを保存しました — ▶実行ボタンで直接実行されます',
+    'ui.codeEditClear':        'ブロック版に戻す',
     'ui.codeEditKeep':         '編集済みコードを実行',
     'ui.codeAppliedToBlocks':  'JSコードをブロック・Pythonに反映しました',
     'ui.codeEditSyntaxError':  '構文エラー',
@@ -397,7 +397,7 @@ const LANGS = {
     'ui.notConnected':'toio is not connected.',
     'ui.simMode':     'Running in simulator mode. Add a real cube via "+ Connect Cube".',
     'ui.ready':           'Code Maker for toio™ started.',
-    'ui.codeOverrideOn':  'JS code manually edited (not reflected in blocks/Python)',
+    'ui.codeOverrideOn':  'Running edited JS directly (could not convert to blocks)',
 
     'ui.cubeAll':     'All',
     'ui.cube1':       'Cube 1',
@@ -562,8 +562,8 @@ const LANGS = {
     'sim3d.hintGrab':  'L-drag: move  R-drag: rotate  Shift+R-drag: tilt  Scroll: lift  Dbl-click: drop',
 
     // Code edit
-    'ui.codeEditApplied':      'Code saved — will be used when running',
-    'ui.codeEditClear':        'Revert to blocks',
+    'ui.codeEditApplied':      'JS saved — will run directly when executed',
+    'ui.codeEditClear':        'Use blocks version',
     'ui.codeEditKeep':         'Run edited code',
     'ui.codeAppliedToBlocks':  'JS code applied to blocks & Python',
     'ui.codeEditSyntaxError':  'Syntax error',
@@ -714,7 +714,7 @@ const LANGS = {
     'ui.notConnected':'toio 未连接。',
     'ui.simMode':     '正在模拟器模式下运行。通过"+ 连接方块"添加真实设备。',
     'ui.ready':           'Code Maker for toio™ 已启动。',
-    'ui.codeOverrideOn':  'JS代码已手动编辑（不反映在积木/Python中）',
+    'ui.codeOverrideOn':  '直接运行编辑的JS（无法转换为积木）',
 
     'ui.cubeAll':     '全部',
     'ui.cube1':       '方块 1',
@@ -879,8 +879,8 @@ const LANGS = {
     'sim3d.hintGrab':  '左拖: 移动  右拖: 旋转  Shift+右拖: 倾斜  滚轮: 抬起  双击: 落下',
 
     // Code edit
-    'ui.codeEditApplied':      '代码已保存 — 运行时将使用此代码',
-    'ui.codeEditClear':        '还原为积木',
+    'ui.codeEditApplied':      'JS已保存 — 将直接运行',
+    'ui.codeEditClear':        '还原为积木版本',
     'ui.codeEditKeep':         '运行编辑代码',
     'ui.codeAppliedToBlocks':  'JS代码已反映至积木和Python',
     'ui.codeEditSyntaxError':  '语法错误',

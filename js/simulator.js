@@ -102,7 +102,7 @@ class SimCubeBackend {
       const rad  = (this._angle - 90) * Math.PI / 180;
 
       this._trail.push({ x: this._x, y: this._y });
-      if (this._trail.length > 400) this._trail.shift();
+      if (this._trail.length > 2000) this._trail.shift();
 
       this._x    += Math.cos(rad) * avg * dt * SCALE;
       this._y    += Math.sin(rad) * avg * dt * SCALE;
@@ -156,7 +156,7 @@ class SimCubeBackend {
       if (this._sim._stopped) return;
       const tt = i / steps;
       this._trail.push({ x: this._x, y: this._y });
-      if (this._trail.length > 400) this._trail.shift();
+      if (this._trail.length > 2000) this._trail.shift();
       this._x = sx + (x - sx) * tt;
       this._y = sy + (y - sy) * tt;
       // NORMAL mode: interpolate to targetAngle during travel
@@ -264,6 +264,17 @@ class SimCubeBackend {
   resetState() {
     this._resetDefaults();
     this._led = null; this._trail = []; this.button = false;
+    this._pendingButton = null;
+    this._buttonListeners = [];
+    this.physicsY = null;
+    this._rollX = 0;
+    this._rollZ = 0;
+  }
+
+  /** Reset position/LED/button only — trail is preserved intentionally. */
+  resetPosition() {
+    this._resetDefaults();
+    this._led = null; this.button = false;
     this._pendingButton = null;
     this._buttonListeners = [];
     this.physicsY = null;
@@ -516,6 +527,13 @@ class ToioSimulator {
   /* ── Reset ────────────────────────────────────────────────────────────── */
   reset() {
     this._cubes.forEach(c => c.resetState());
+    this._dirty = true;
+    if (this._statusFn) this._statusFn(this._cubes);
+  }
+
+  /** Reset cube positions/LED/buttons only — trails are preserved. */
+  resetPosition() {
+    this._cubes.forEach(c => c.resetPosition());
     this._dirty = true;
     if (this._statusFn) this._statusFn(this._cubes);
   }

@@ -964,7 +964,7 @@ document.getElementById('btn-run').addEventListener('click', async () => {
   _running = true;
   document.getElementById('btn-run').disabled = true;
   document.getElementById('btn-stop').disabled = false;
-  sim.reset();   // Reset cube positions/trails before each run
+  sim.resetPosition();   // Reset cube positions before each run (trail preserved until manual reset)
   _addLog(i('start'), 'start');
   try {
     await rt.run(USER_CODE);
@@ -3494,7 +3494,7 @@ function initCodeEdit() {
           });
           pre.style.backgroundImage = bands.length ? `linear-gradient(to bottom,${bands.join(',')})` : '';
           const n = parsed.errorLines.length;
-          log(`⚠ ${n}行をブロックに変換できませんでした（赤でハイライト）。`, 'warn');
+          log(`ℹ ${n}行が変換不可（赤でハイライト）— その他の行はブロックに反映済みです。`, 'info');
           let banner = document.getElementById('code-override-banner');
           if (!banner) {
             banner = document.createElement('div');
@@ -3506,7 +3506,7 @@ function initCodeEdit() {
           banner.className = 'code-override-banner code-override-error';
           banner.innerHTML =
             `<span class="code-err-icon">!</span>` +
-            `<span class="err-msg">${n}行が変換不可（赤でハイライト）— import/def/asyncio等は非対応</span>` +
+            `<span class="err-msg">${n}行が変換不可（赤）— import/def/asyncio等は非対応。対応行はブロックに反映済み</span>` +
             `<button onclick="window._restorePrevPythonState&&window._restorePrevPythonState()">前の状態に戻す</button>` +
             `<button onclick="document.getElementById('ws-code-output').style.backgroundImage='';document.getElementById('code-override-banner')?.remove()">閉じる</button>`;
 
@@ -3580,7 +3580,7 @@ function initCodeEdit() {
           });
           pre.style.backgroundImage = bands.length ? `linear-gradient(to bottom,${bands.join(',')})` : '';
           const n = parsed.errorLines.length;
-          log(`⚠ ${n}行をブロックに変換できませんでした（赤でハイライト）。修正するかコードを手動編集してください。`, 'warn');
+          log(`ℹ ${n}行が変換不可（赤でハイライト）— その他の行はブロックに反映済みです。`, 'info');
           // Show a partial-warning banner
           let banner = document.getElementById('code-override-banner');
           if (!banner) {
@@ -3593,14 +3593,14 @@ function initCodeEdit() {
           banner.className = 'code-override-banner code-override-error';
           banner.innerHTML =
             `<span class="code-err-icon">!</span>` +
-            `<span class="err-msg">${n}行が変換不可（赤でハイライト）— 変数や関数定義はブロック非対応です</span>` +
+            `<span class="err-msg">${n}行が変換不可（赤）— 変数・関数定義はブロック非対応。対応行はブロックに反映済み</span>` +
             `<button onclick="document.getElementById('ws-code-output').style.backgroundImage='';document.getElementById('code-override-banner')?.remove()">閉じる</button>`;
         } else {
           // Complete failure: keep as JS override
           _codeOverride = code;
           pre.classList.add('code-override');
           pre.style.backgroundImage = '';
-          log('▲ ' + (t('ui.codeOverrideOn') || 'Code override ON'), 'info');
+          log('ℹ JSコードを直接実行モードで保存しました（ブロックへの変換ができませんでした）', 'info');
           showOverrideBanner(null);
           _switchLangTab('javascript');
           updateCodePanel();
