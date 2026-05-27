@@ -1,8 +1,9 @@
-# Code Maker for toio™
+# [Code Maker for toio™](https://akichika.github.io/code-maker-for-toio/)*
 
 **ブラウザだけで動く** toio ビジュアルプログラミング IDE。  
 Scratch 風のブロックでコーディングし、WebBluetooth でリアルタイムに toio キューブを制御できます。
-> すぐに試したい方はこちら：`https://akichika.github.io/code-maker-for-toio/`
+
+**すぐに試したい方はこちら:[Code Maker for toio™](https://akichika.github.io/code-maker-for-toio/)**
 
 
 ![Overview](docs/screenshots/overview.png)
@@ -129,7 +130,7 @@ API キーは設定ダイアログから入力（ブラウザのローカルス�
 
 ## 使い方 / Quick Start
 
-すぐに試したい方はこちら：`https://akichika.github.io/code-maker-for-toio/`
+**すぐに試したい方はこちら:[Code Maker for toio™](https://akichika.github.io/code-maker-for-toio/)**
 
 ### 1. ローカルサーバーの起動
 
