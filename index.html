@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code Maker for toio™</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230078FF'/><circle cx='16' cy='16' r='8' fill='white'/><circle cx='16' cy='16' r='4' fill='%230078FF'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=5">
+
+  <!-- i18n must load first (t() used by blocks.js) -->
+  <script src="js/i18n.js?v=9"></script>
+
+  <!-- Blockly v9 -->
+  <script src="https://cdn.jsdelivr.net/npm/blockly@9.3.3/blockly_compressed.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/blockly@9.3.3/blocks_compressed.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/blockly@9.3.3/javascript_compressed.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/blockly@9.3.3/python_compressed.js"></script>
+  <!-- Local Blockly messages (CDN ORB-blocked) -->
+  <script src="js/messages.js?v=4"></script>
+
+  <!-- Three.js r128 -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+<div id="app">
+
+  <!-- ─── Header ─────────────────────────────────────────────────────────────── -->
+  <header id="header">
+    <div id="logo">
+      <div class="logo-icon">
+        <!-- toio-inspired mark: outer ring + inner dot -->
+        <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="9" cy="9" r="8" stroke="white" stroke-width="2"/>
+          <circle cx="9" cy="9" r="3.5" fill="white"/>
+        </svg>
+      </div>
+      <span class="logo-text">Code Maker <a href="https://toio.io" target="_blank" rel="noopener noreferrer" class="logo-toio-link">for toio™</a></span>
+    </div>
+
+    <!-- Cube connection badges -->
+    <div id="cube-list">
+      <button id="btn-add-cube" data-i18n="ui.connect"></button>
+    </div>
+
+    <!-- Run controls -->
+    <div id="run-controls">
+      <!-- Theme toggle -->
+      <button id="btn-theme" class="btn-flat" title="テーマ切替">
+        <span class="theme-icon" style="font-size:1rem;line-height:1">☀</span>
+      </button>
+
+      <!-- Language selector -->
+      <span class="lang-globe" title="Language / 言語">🌐</span>
+      <select id="lang-select" title="Language">
+        <option value="ja" selected>日本語</option>
+        <option value="en">English</option>
+        <option value="zh">中文</option>
+      </select>
+
+      <!-- Project name -->
+      <input type="text" id="project-name" value="New Project" placeholder="New Project" title="プロジェクト名">
+
+      <button id="btn-save" class="btn btn-ghost btn-sm">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M2 2h9l3 3v9a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm7 0v4H5V2H3v12h10V5.4L10.6 4H9zM5 9h6v5H5V9z"/>
+        </svg>
+        <span data-i18n="ui.save"></span>
+      </button>
+      <button id="btn-load" class="btn btn-ghost btn-sm">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M1 3.5A1.5 1.5 0 0 1 2.5 2h2.764c.958 0 1.76.56 2.311 1.184C7.985 3.648 8.48 4 9 4h4.5A1.5 1.5 0 0 1 15 5.5v7a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 12.5v-9z"/>
+        </svg>
+        <span data-i18n="ui.load"></span>
+      </button>
+      <input type="file" id="file-input" accept=".xml" style="display:none">
+      <button id="btn-run"  class="btn btn-success">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M3 2.5l10 5.5-10 5.5V2.5z"/></svg>
+        <span data-i18n="ui.run"></span>
+      </button>
+      <button id="btn-stop" class="btn btn-danger" disabled>
+        <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="2" width="12" height="12" rx="1"/></svg>
+        <span data-i18n="ui.stop"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ─── Main (3-zone resizable layout) ──────────────────────────────────── -->
+  <div id="main">
+
+    <!-- Zone 1 · Blockly workspace -->
+    <div id="workspace-panel">
+      <div class="panel-header" id="workspace-header">
+        <div class="panel-tabs" id="ws-tabs">
+          <button class="ptab active" id="tab-blocks-btn">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zm8 0A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm-8 8A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm8 0A1.5 1.5 0 0 1 10.5 9h3A1.5 1.5 0 0 1 15 10.5v3A1.5 1.5 0 0 1 13.5 15h-3A1.5 1.5 0 0 1 9 13.5v-3z"/></svg>
+            <span data-i18n="cat.blocks"></span>
+          </button>
+          <button class="ptab" id="tab-wscode-btn">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M5.854 4.854a.5.5 0 1 0-.708-.708l-3.5 3.5a.5.5 0 0 0 0 .708l3.5 3.5a.5.5 0 0 0 .708-.708L2.707 8l3.147-3.146zm4.292 0a.5.5 0 0 1 .708-.708l3.5 3.5a.5.5 0 0 1 0 .708l-3.5 3.5a.5.5 0 0 1-.708-.708L13.293 8l-3.147-3.146z"/></svg>
+            <span data-i18n="ui.code"></span>
+          </button>
+          <!-- Split view button -->
+          <button class="btn-flat" id="btn-split-view" title="並列表示">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M0 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3zm8.5-1v12H14a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H8.5zm-1 0H2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h5.5V2z"/></svg>
+          </button>
+        </div>
+
+        <!-- Sample programs selector -->
+        <select id="sample-select" title=""></select>
+
+        <!-- Undo / Redo -->
+        <button class="btn-flat" id="btn-undo" title="">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+            <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+          </svg>
+        </button>
+        <button class="btn-flat" id="btn-redo" title="">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
+            <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
+          </svg>
+        </button>
+
+        <!-- Block count badge -->
+        <span id="block-count" class="block-count-badge zero" title="">0</span>
+
+        <div class="panel-header-actions" id="ws-block-tools">
+          <button class="btn-flat" id="btn-new-program" title="">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+              <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+            </svg>
+          </button>
+          <button class="btn-flat" id="btn-cleanup-blocks" title="Align blocks">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h2v2H2V2zm0 4h2v2H2V6zm0 4h2v2H2v-2zm4-8h8v2H6V2zm0 4h8v2H6V6zm0 4h8v2H6v-2z"/></svg>
+          </button>
+          <button class="btn-flat" id="btn-fit-blocks" title="Fit to screen">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 1h4a.5.5 0 0 1 0 1H2v3.5a.5.5 0 0 1-1 0V1.5A.5.5 0 0 1 1.5 1zm9 0h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V2h-3.5a.5.5 0 0 1 0-1zM1 10.5a.5.5 0 0 1 .5-.5h.5v3.5h3.5a.5.5 0 0 1 0 1H1.5a.5.5 0 0 1-.5-.5v-4zm14 0v4a.5.5 0 0 1-.5.5h-4a.5.5 0 0 1 0-1H14V10.5a.5.5 0 0 1 1 0z"/></svg>
+          </button>
+          <button class="btn-flat btn-level" id="btn-level-toggle" title="">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M5 10.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1h-10a.5.5 0 0 1-.5-.5z"/>
+            </svg>
+          </button>
+          <!-- Card scanner button -->
+          <button class="btn-flat" id="btn-card-scan" title="カードスキャン" data-i18n-title="ui.cardScan">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21 15 16 10 5 21"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="ws-views-row" id="ws-views-row">
+      <div id="ws-blocks-view">
+        <div id="blockly-div"></div>
+      </div>
+      <div id="ws-code-view" style="display:none">
+        <div class="code-toolbar" id="ws-code-toolbar">
+          <button class="lang-btn active" id="ws-lang-js" data-lang="javascript" data-i18n="ui.javascript"></button>
+          <button class="lang-btn" id="ws-lang-py" data-lang="python" data-i18n="ui.python"></button>
+          <!-- Edit/Apply/Cancel buttons for direct code editing -->
+          <button class="btn btn-ghost btn-sm" id="btn-ws-edit" title="Edit code directly" style="margin-left:auto">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </button>
+          <button class="btn btn-sm" id="btn-ws-apply" style="display:none;background:#18B86B;color:#fff;font-size:.7rem;padding:2px 7px">✓</button>
+          <button class="btn btn-ghost btn-sm" id="btn-ws-cancel" style="display:none;font-size:.7rem;padding:2px 6px">✕</button>
+          <button class="btn btn-ghost btn-sm" id="btn-ws-copy" title="Copy">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            <span data-i18n="ui.copy"></span>
+          </button>
+          <button class="btn btn-ghost btn-sm" id="btn-ws-export">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+              <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+            </svg>
+            <span id="ws-export-label" data-i18n="ui.exportJs"></span>
+          </button>
+          <button class="btn btn-ghost btn-sm" id="btn-ws-html">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M5.854 4.854a.5.5 0 1 0-.708-.708l-3.5 3.5a.5.5 0 0 0 0 .708l3.5 3.5a.5.5 0 0 0 .708-.708L2.707 8l3.147-3.146zm4.292 0a.5.5 0 0 1 .708-.708l3.5 3.5a.5.5 0 0 1 0 .708l-3.5 3.5a.5.5 0 0 1-.708-.708L13.293 8l-3.147-3.146z"/>
+            </svg>
+            <span data-i18n="ui.downloadHtml"></span>
+          </button>
+        </div>
+        <pre id="ws-code-output"></pre>
+      </div>
+      </div><!-- /ws-views-row -->
+    </div>
+
+    <!-- Vertical divider -->
+    <div class="div-v" id="div-v"></div>
+
+    <!-- Zone 2 · Right column (simulator + bottom panel) -->
+    <div id="right-col">
+
+      <!-- ── Simulator panel ──────────────────────────────────────────────── -->
+      <div id="sim-panel" class="panel-card">
+        <div class="panel-header">
+          <span class="panel-header-title" data-i18n="ui.simulator"></span>
+
+          <!-- 2D / 3D toggle -->
+          <div class="btn-seg" id="seg-view">
+            <button class="seg-opt active" data-view="2d">2D</button>
+            <button class="seg-opt"        data-view="3d">3D</button>
+          </div>
+
+          <!-- Mat selector (populated by JS) -->
+          <select id="mat-select"></select>
+
+          <div class="cube-count-wrap" title="Simulator cubes">
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v1h14V4a1 1 0 0 0-1-1H2zm13 4H1v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7z"/></svg>
+            <input type="number" id="sim-cube-count" min="1" max="4" value="1" title="Simulator cube count">
+          </div>
+
+          <div class="panel-header-actions">
+            <!-- 2D trail toggle (hidden in 3D mode — 3D has its own toolbar) -->
+            <button class="btn-flat" id="btn-2d-trail" title="軌跡 ON/OFF">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 20 C6 14 10 16 13 11 S18 5 21 4"/></svg>
+            </button>
+            <button class="btn-flat" id="btn-reset-sim" title="">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
+                <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
+              </svg>
+            </button>
+            <button class="btn-flat" id="btn-sim-button" title="">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+                <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                <circle cx="8" cy="8" r="3"/>
+              </svg>
+            </button>
+            <button class="btn-flat" id="btn-fullscreen-sim" title="">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M1.5 1h4a.5.5 0 0 1 0 1H2v3.5a.5.5 0 0 1-1 0V1.5A.5.5 0 0 1 1.5 1zm9 0h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V2h-3.5a.5.5 0 0 1 0-1zM1 10.5a.5.5 0 0 1 .5-.5h.5v3.5h3.5a.5.5 0 0 1 0 1H1.5a.5.5 0 0 1-.5-.5v-4zm14 0v4a.5.5 0 0 1-.5.5h-4a.5.5 0 0 1 0-1H14V10.5a.5.5 0 0 1 1 0z"/>
+              </svg>
+            </button>
+            <button class="btn-flat" id="btn-float-sim" title="">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M1.5 2A.5.5 0 0 0 1 2.5v11a.5.5 0 0 0 .5.5H6v-1H2V3h12v3h1V2.5a.5.5 0 0 0-.5-.5h-13z"/>
+                <path d="M9.5 7a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-5a.5.5 0 0 1 .5-.5h5zm-5 1v4h4V8h-4z"/>
+                <path d="M15.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L14.293 8H10.5a.5.5 0 0 1 0-1h3.793L12.146 5.854a.5.5 0 1 1 .708-.708l3 3z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Canvas area -->
+        <div id="sim-inner">
+          <canvas id="sim-canvas-2d"></canvas>
+          <div id="sim-canvas-3d"></div>
+        </div>
+
+        <!-- Status strip -->
+        <div id="sim-status"></div>
+        <!-- Variable monitor (shown when variables are in workspace) -->
+        <div id="var-monitor" style="display:none">
+          <div id="var-monitor-title" data-i18n="ui.varMonitor">変数モニター</div>
+          <div id="var-monitor-items"></div>
+        </div>
+      </div>
+
+      <!-- Horizontal divider -->
+      <div class="div-h" id="div-h"></div>
+
+      <!-- ── Bottom panel (AI / Console) ────────────────────────────────── -->
+      <div id="bottom-panel" class="panel-card">
+        <div class="panel-header">
+          <div class="panel-tabs" id="bottom-tabs">
+            <button class="ptab active" data-tab="llm"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg><span data-i18n="ui.ai"></span><sup class="ai-beta-badge">β</sup></button>
+            <button class="ptab" data-tab="console"><svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M6 9a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3A.5.5 0 0 1 6 9zM3.854 4.146a.5.5 0 1 0-.708.708L4.793 6.5 3.146 8.146a.5.5 0 1 0 .708.708l2-2a.5.5 0 0 0 0-.708l-2-2z"/><path d="M2 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2zm12 1a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h12z"/></svg><span data-i18n="ui.console"></span></button>
+          </div>
+          <div class="panel-header-actions">
+            <button class="btn-flat" id="btn-float-bottom" title="">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M1.5 2A.5.5 0 0 0 1 2.5v11a.5.5 0 0 0 .5.5H6v-1H2V3h12v3h1V2.5a.5.5 0 0 0-.5-.5h-13z"/>
+                <path d="M9.5 7a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-5a.5.5 0 0 1 .5-.5h5zm-5 1v4h4V8h-4z"/>
+                <path d="M15.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L14.293 8H10.5a.5.5 0 0 1 0-1h3.793L12.146 5.854a.5.5 0 1 1 .708-.708l3 3z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Hidden code-output for backward compat (driven by ws-code-output) -->
+        <pre id="code-output" style="display:none"></pre>
+
+        <!-- AI tab (default active) -->
+        <div class="panel-content active" id="tab-llm">
+          <div id="llm-toolbar">
+            <button id="btn-api-toggle" class="btn-flat" title="API設定">▶</button>
+            <div id="llm-api-area">
+              <select id="llm-provider">
+                <option value="anthropic" data-i18n="llm.anthropic"></option>
+                <option value="openai"    data-i18n="llm.openai"></option>
+                <option value="gemini">Gemini (Google)</option>
+              </select>
+              <input type="password" id="llm-api-key" placeholder="API Key">
+              <div class="llm-model-row">
+                <select id="llm-model-select" title="使用するモデルを選択（APIキー入力後に⟳で一覧取得）">
+                  <option value="">── APIキーを入力 → ⟳ ──</option>
+                </select>
+                <button id="btn-llm-fetch-models" class="btn-flat llm-fetch-btn" title="モデル一覧を取得">⟳</button>
+              </div>
+            </div>
+            <button id="btn-llm-clear" class="btn btn-ghost btn-sm">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+              </svg>
+            </button>
+            <select id="llm-code-style" title="コードスタイル" class="llm-style-sel">
+              <option value="position">位置ベース (座標)</option>
+              <option value="time">時間ベース</option>
+            </select>
+          </div><!-- /llm-toolbar -->
+          <div id="llm-messages">
+            <div class="llm-msg assistant">
+              <div class="msg-role">AI</div>
+              <div class="msg-body" id="llm-greeting"></div>
+            </div>
+          </div>
+          <div id="llm-input-wrap">
+            <textarea id="llm-input"></textarea>
+            <button id="btn-llm-send" class="btn btn-primary">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 1.59 2.498C8 14 8 13 8 12.5a4.5 4.5 0 0 1 5.026-4.47L15.964.686zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.435 1.293z"/></svg>
+              <span data-i18n="llm.send"></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Console tab -->
+        <div class="panel-content" id="tab-console">
+          <div class="code-toolbar">
+            <span style="font-size:.72rem;color:var(--text-muted)" data-i18n="ui.runLog"></span>
+            <button id="btn-clear-console" class="btn btn-ghost btn-sm" style="margin-left:auto" data-i18n="ui.clear"></button>
+          </div>
+          <div id="console-output"></div>
+        </div>
+
+      </div><!-- /bottom-panel -->
+    </div><!-- /right-col -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- Application scripts (order matters) — ?v= bumped on each deploy to bust cache -->
+<script src="js/card-scanner.js?v=21"></script>
+<script src="js/toio.js?v=8"></script>
+<script src="js/blocks.js?v=6"></script>
+<script src="js/generators.js?v=9"></script>
+<script src="js/simulator.js?v=5"></script>
+<script src="js/runtime.js?v=6"></script>
+<script src="js/llm.js?v=10"></script>
+<script src="js/app.js?v=15"></script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+# Claude Code internal files
+.claude/
+
+# Node / npm (if a dev server is ever added)
+node_modules/
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor / IDE
+.vscode/settings.json
+*.swp
+*~
+
+# Local environment
+*.env
+.env.local
+
+# Build output (not used now, reserved)
+dist/
+build/
+
+# Temp / cache
+*.tmp
+*.cache
