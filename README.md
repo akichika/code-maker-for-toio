@@ -63,6 +63,12 @@ Scratch 風のブロックでコーディングし、WebBluetooth でリアル�
 
 toio Playground Command カードをカメラや画像ファイルで読み取り、Blockly ブロックに自動変換します。
 
+![toio PG Card](docs/screenshots/toio-pg-card-example.png)
+![card-scanner-ex1](docs/screenshots/card-scanner-ex1.png)
+![card-scanner-ex2](docs/screenshots/card-scanner-ex2.png)
+![card-scanner-ex3](docs/screenshots/card-scanner-ex3.png)
+
+
 **ローカル認識 (AI 不要)**:  
 カードの色・アイコンのピクセル解析で 24 種類のカードを識別。
 
