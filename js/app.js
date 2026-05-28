@@ -1222,6 +1222,20 @@ function initLLMApiCollapse() {
 // ─── UI wiring ───────────────────────────────────────────────────────────────
 
 function initUI() {
+  // Hamburger menu toggle (mobile only)
+  const hamburgerBtn = document.getElementById('btn-hamburger');
+  if (hamburgerBtn) {
+    hamburgerBtn.addEventListener('click', () => {
+      document.getElementById('header').classList.toggle('menu-open');
+    });
+    // Close menu when clicking outside the header
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#header')) {
+        document.getElementById('header').classList.remove('menu-open');
+      }
+    });
+  }
+
   document.getElementById('btn-add-cube').addEventListener('click', addCube);
 
   const cubeCountInput = document.getElementById('sim-cube-count');
