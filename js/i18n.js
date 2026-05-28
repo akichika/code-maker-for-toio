@@ -194,7 +194,7 @@ const LANGS = {
     'tip.print':    'コンソールにテキストを表示します。デバッグに便利。',
     'tip.onStart':  'スタートボタンを押したときに実行されます。複数のスタートブロックがある場合は同時並行で実行されます（Scratchのスタートフラグと同じ動作）。',
     'tip.onButton': 'キューブのボタンが押されたときに実行されます。',
-    'tip.runAction': '事前に登録したPlaygroundアクション(スロット1または2)を実行します。',
+    'tip.runAction': '事前に登録したトイオ・プレイグラウンド コマンドのアクション(スロット1または2)を実行します。',
     'tip.moveRel':   '現在の向きを基準に前後に移動します。距離はマット座標の単位（約1mm）です。',
     'tip.rotateRel': '現在の角度から相対的に回転します。右=時計回り、左=反時計回り。',
 
@@ -280,7 +280,7 @@ const LANGS = {
     'sc.addBtn':         '追加',
     'sc.back':           '← 戻る',
     'sc.applyBlocks':    'ブロックに変換',
-    'sc.hint':           'toio Playground コマンドカードを横に並べ、上から撮影するか画像ファイルを選択してください。',
+    'sc.hint':           'トイオ・プレイグラウンド コマンドカードを横に並べ、上から撮影するか画像ファイルを選択してください。',
     'sc.hintSmall':      'カメラはモバイルブラウザで動作します。PCはファイル選択を推奨します。',
 
     // Card scanner settings dialog
@@ -341,6 +341,22 @@ const LANGS = {
     // Action function names (used as Blockly procedure names)
     'action.name1':        'こうどう1',
     'action.name2':        'こうどう2',
+
+    // About dialog
+    'about.title':         'このアプリについて',
+    'about.appName':       'Code Maker for toio™',
+    'about.fanMade':       'ファンメイド・非公式ツール',
+    'about.disclaimer':    'このアプリは株式会社ソニー・インタラクティブエンタテインメントとは無関係の個人が制作したファンメイドツールです。',
+    'about.pgCmd':         'toio™、トイオ、トイオ・プレイグラウンド コマンドは株式会社ソニー・インタラクティブエンタテインメントの登録商標または商標です。',
+    'about.oss':           'オープンソース (MIT ライセンス)',
+    'about.github':        'GitHubリポジトリを見る',
+    'about.officialTitle': 'toio 公式情報',
+    'about.official':      'toio 公式サイト',
+    'about.playground':    'トイオ・プレイグラウンド コマンド',
+    'about.buy':           '購入ページ',
+    'about.credits':       'クレジット',
+    'about.dev':           '開発:',
+    'about.close':         '閉じる',
   },
 
   /* ── English ──────────────────────────────────────────────────────────────── */
@@ -658,6 +674,22 @@ const LANGS = {
     // Action function names (used as Blockly procedure names)
     'action.name1':        'action1',
     'action.name2':        'action2',
+
+    // About dialog
+    'about.title':         'About This App',
+    'about.appName':       'Code Maker for toio™',
+    'about.fanMade':       'Fan-made / Unofficial Tool',
+    'about.disclaimer':    'This app is an independent fan-made tool and is not affiliated with Sony Interactive Entertainment Inc.',
+    'about.pgCmd':         'toio™, Toio, and toio Playground Command are registered trademarks or trademarks of Sony Interactive Entertainment Inc.',
+    'about.oss':           'Open Source (MIT License)',
+    'about.github':        'View on GitHub',
+    'about.officialTitle': 'Official toio Links',
+    'about.official':      'toio Official Site',
+    'about.playground':    'toio Playground Command',
+    'about.buy':           'Buy toio',
+    'about.credits':       'Credits',
+    'about.dev':           'Developer:',
+    'about.close':         'Close',
   },
 
   /* ── Chinese (Simplified) ─────────────────────────────────────────────────── */
@@ -975,6 +1007,22 @@ const LANGS = {
     // Action function names (used as Blockly procedure names)
     'action.name1':        '动作1',
     'action.name2':        '动作2',
+
+    // About dialog
+    'about.title':         '关于本应用',
+    'about.appName':       'Code Maker for toio™',
+    'about.fanMade':       '粉丝制作 / 非官方工具',
+    'about.disclaimer':    '本应用是与索尼互动娱乐株式会社无关的个人制作的粉丝工具。',
+    'about.pgCmd':         'toio™、Toio、toio Playground Command是索尼互动娱乐株式会社的注册商标或商标。',
+    'about.oss':           '开源 (MIT 许可证)',
+    'about.github':        '在GitHub查看',
+    'about.officialTitle': 'toio 官方链接',
+    'about.official':      'toio 官方网站',
+    'about.playground':    'toio Playground Command',
+    'about.buy':           '购买 toio',
+    'about.credits':       '致谢',
+    'about.dev':           '开发者:',
+    'about.close':         '关闭',
   },
 };
 

@@ -8,10 +8,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=7">
+  <link rel="stylesheet" href="css/style.css?v=9">
 
   <!-- i18n must load first (t() used by blocks.js) -->
-  <script src="js/i18n.js?v=11"></script>
+  <script src="js/i18n.js?v=14"></script>
 
   <!-- Blockly v9 -->
   <script src="https://cdn.jsdelivr.net/npm/blockly@9.3.3/blockly_compressed.js"></script>
@@ -58,6 +58,13 @@
             0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
         </svg>
       </a>
+      <!-- About button -->
+      <button id="btn-about" class="btn-flat logo-about-btn" title="このアプリについて" aria-label="About">
+        <svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" width="14" height="14" aria-hidden="true">
+          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+          <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+        </svg>
+      </button>
     </div>
 
     <!-- Cube connection badges -->
@@ -118,6 +125,65 @@
       </button>
     </div>
   </header>
+
+  <!-- ─── About dialog (outside header to avoid stacking-context trap) ─────── -->
+  <div id="about-overlay" class="about-overlay" role="dialog" aria-modal="true" aria-labelledby="about-dialog-title" hidden>
+    <div class="about-dialog">
+      <div class="about-header">
+        <div class="about-logo-mark">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2.5"/>
+            <circle cx="12" cy="12" r="4.5" fill="currentColor"/>
+          </svg>
+        </div>
+        <div>
+          <div class="about-app-name" data-i18n="about.appName">Code Maker for toio™</div>
+          <div class="about-fan-badge" data-i18n="about.fanMade">ファンメイド・非公式ツール</div>
+        </div>
+        <button class="about-close-btn btn-flat" id="btn-about-close" aria-label="Close">
+          <svg viewBox="0 0 16 16" fill="currentColor" width="16" height="16"><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
+        </button>
+      </div>
+      <div class="about-body">
+
+        <!-- Disclaimer -->
+        <p class="about-disclaimer" data-i18n="about.disclaimer"></p>
+        <p class="about-trademark" data-i18n="about.pgCmd"></p>
+
+        <!-- OSS / GitHub -->
+        <div class="about-section">
+          <span class="about-section-label" data-i18n="about.oss"></span>
+          <a href="https://github.com/akichika/code-maker-for-toio" target="_blank" rel="noopener noreferrer" class="about-link" data-i18n="about.github"></a>
+        </div>
+
+        <!-- Official links -->
+        <div class="about-section">
+          <span class="about-section-label" data-i18n="about.officialTitle"></span>
+          <div class="about-links-row">
+            <a href="https://toio.io" target="_blank" rel="noopener noreferrer" class="about-link" data-i18n="about.official"></a>
+            <a href="https://toio.io/titles/pg-cmd.html" target="_blank" rel="noopener noreferrer" class="about-link" data-i18n="about.playground"></a>
+            <a href="https://www.amazon.co.jp/s?k=toio" target="_blank" rel="noopener noreferrer" class="about-link" data-i18n="about.buy"></a>
+          </div>
+        </div>
+
+        <!-- Credits -->
+        <div class="about-section">
+          <span class="about-section-label" data-i18n="about.credits"></span>
+          <span class="about-credit-text">
+            <span data-i18n="about.dev"></span>
+            <a href="https://github.com/akichika" target="_blank" rel="noopener noreferrer" class="about-link">akichika</a>
+            （<a href="https://x.com/akichika" target="_blank" rel="noopener noreferrer" class="about-link">X</a>
+            / <a href="https://github.com/akichika" target="_blank" rel="noopener noreferrer" class="about-link">GitHub</a>）
+          </span>
+        </div>
+
+      </div>
+      <div class="about-footer">
+        <span class="about-version" id="about-version"></span>
+        <button class="btn btn-ghost btn-sm" id="btn-about-ok" data-i18n="about.close">閉じる</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ─── Main (3-zone resizable layout) ──────────────────────────────────── -->
   <div id="main">
@@ -393,6 +459,6 @@
 <script src="js/simulator.js?v=6"></script>
 <script src="js/runtime.js?v=6"></script>
 <script src="js/llm.js?v=12"></script>
-<script src="js/app.js?v=20"></script>
+<script src="js/app.js?v=22"></script>
 </body>
 </html>

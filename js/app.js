@@ -1,5 +1,7 @@
 /* app.js — Main application orchestration for toio Visual Programming */
 
+const APP_VERSION = '1.3.0';
+
 let workspace  = null;
 let simulator  = null;
 let runtime    = null;
@@ -90,6 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
   _safe('initCodeEdit',       () => initCodeEdit());
   _safe('initBlockContextMenu',() => initBlockContextMenu());
   _safe('initCardScanner',    () => initCardScanner());
+  _safe('initAboutDialog',    () => initAboutDialog());
 
   // Register workspace-save hook so language-switch reload doesn't lose work
   window._onBeforeLangReload = () => {
@@ -4694,4 +4697,43 @@ function buildToolbox() {
       },
     ],
   };
+}
+
+// ─── About dialog ─────────────────────────────────────────────────────────────
+
+function initAboutDialog() {
+  const overlay  = document.getElementById('about-overlay');
+  const btnOpen  = document.getElementById('btn-about');
+  const btnClose = document.getElementById('btn-about-close');
+  const btnOk    = document.getElementById('btn-about-ok');
+  if (!overlay || !btnOpen) return;
+
+  // Inject version
+  const verEl = document.getElementById('about-version');
+  if (verEl) verEl.textContent = `v${APP_VERSION}`;
+
+  function openAbout() {
+    overlay.removeAttribute('hidden');
+    document.body.style.overflow = 'hidden';
+    btnClose && btnClose.focus();
+  }
+  function closeAbout() {
+    overlay.setAttribute('hidden', '');
+    document.body.style.overflow = '';
+    btnOpen.focus();
+  }
+
+  btnOpen.addEventListener('click',  openAbout);
+  btnClose && btnClose.addEventListener('click', closeAbout);
+  btnOk    && btnOk.addEventListener('click',    closeAbout);
+
+  // Close on backdrop click
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeAbout();
+  });
+
+  // Close on Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !overlay.hasAttribute('hidden')) closeAbout();
+  });
 }
