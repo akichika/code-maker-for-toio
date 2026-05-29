@@ -93,6 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
   _safe('initBlockContextMenu',() => initBlockContextMenu());
   _safe('initCardScanner',    () => initCardScanner());
   _safe('initAboutDialog',    () => initAboutDialog());
+  _safe('initMobileLayout',   () => initMobileLayout());
 
   // Register workspace-save hook so language-switch reload doesn't lose work
   window._onBeforeLangReload = () => {
@@ -4697,6 +4698,90 @@ function buildToolbox() {
       },
     ],
   };
+}
+
+// ─── Mobile layout (panel tab bar) ────────────────────────────────────────────
+
+function initMobileLayout() {
+  const MOBILE_MQ = window.matchMedia('(max-width: 700px)');
+  const LAND_MQ   = window.matchMedia('(max-width: 700px) and (orientation: landscape)');
+
+  const mTabs = Array.from(document.querySelectorAll('.m-ptab'));
+  if (!mTabs.length) return;
+
+  const wp = document.getElementById('workspace-panel');
+  const rc = document.getElementById('right-col');
+  const sp = document.getElementById('sim-panel');
+  const bp = document.getElementById('bottom-panel');
+
+  let _lastPanel = 'workspace';
+
+  function _resizeAll() {
+    try { if (workspace) Blockly.svgResize(workspace); } catch(e) {}
+    try { if (simulator) simulator.resize(); } catch(e) {}
+  }
+
+  function switchPanel(panel) {
+    _lastPanel = panel;
+    if (!MOBILE_MQ.matches) return; // desktop: do nothing
+
+    const isLandscape = LAND_MQ.matches;
+
+    // Update tab active state
+    mTabs.forEach(t => t.classList.toggle('active', t.dataset.mpanel === panel));
+
+    if (isLandscape) {
+      // Landscape: workspace always visible; right-col switches Sim vs Code
+      wp.classList.add('m-active');
+      rc.classList.add('m-active');
+      const showSim  = panel === 'sim' || panel === 'workspace';
+      sp.classList.toggle('m-subactive', showSim);
+      bp.classList.toggle('m-subactive', !showSim);
+    } else {
+      // Portrait: one full-height panel at a time
+      const showWS = panel === 'workspace';
+      wp.classList.toggle('m-active', showWS);
+      rc.classList.toggle('m-active', !showWS);
+      sp.classList.toggle('m-subactive', panel === 'sim');
+      bp.classList.toggle('m-subactive', panel === 'code');
+    }
+
+    setTimeout(_resizeAll, 60);
+  }
+
+  // Wire tab clicks
+  mTabs.forEach(tab => {
+    tab.addEventListener('click', () => switchPanel(tab.dataset.mpanel));
+  });
+
+  // Re-apply on orientation change
+  window.addEventListener('orientationchange', () => {
+    setTimeout(() => switchPanel(_lastPanel), 200);
+  });
+
+  // Also handle resize (e.g. DevTools viewport toggle)
+  let _resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(_resizeTimer);
+    _resizeTimer = setTimeout(() => {
+      if (MOBILE_MQ.matches) {
+        switchPanel(_lastPanel);
+      } else {
+        // Restore desktop layout
+        [wp, rc, sp, bp].forEach(el => {
+          el && el.classList.remove('m-active', 'm-subactive');
+        });
+        _resizeAll();
+      }
+    }, 150);
+  });
+
+  // Initialize on load
+  if (MOBILE_MQ.matches) {
+    // Default: portrait → workspace; landscape → sim
+    const initPanel = LAND_MQ.matches ? 'sim' : 'workspace';
+    switchPanel(initPanel);
+  }
 }
 
 // ─── About dialog ─────────────────────────────────────────────────────────────

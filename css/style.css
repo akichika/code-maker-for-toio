@@ -1648,75 +1648,181 @@ select, input { font-family: inherit; }
   background: #FFF;
 }
 
+/* ─── Sim title (icon + label) ───────────────────────────────────────────────── */
+.sim-title { display: flex; align-items: center; gap: 5px; }
+.sim-title-icon { flex-shrink: 0; opacity: .8; }
+
+/* ─── Mobile panel tab bar ───────────────────────────────────────────────────── */
+#mobile-panel-tabs {
+  display: none; /* hidden on desktop */
+}
+
 /* ─── Responsive ─────────────────────────────────────────────────────────────── */
 
-/* Tablet / large phone landscape (≤ 700px) */
+/* ── ≤ 700px: phones + small tablets (portrait AND landscape) ─────────────── */
 @media (max-width: 700px) {
-  :root { --col-split: 100vw; --header-h: 44px; }
+  /* Slightly smaller base type so more fits */
+  html { font-size: 14px; }
+  :root { --header-h: 44px; }
 
-  /* Header: allow wrapping for crowded items */
-  #header { flex-wrap: wrap; height: auto; min-height: 44px; padding: 6px 10px; gap: 6px; }
+  /* ── Header ── */
+  #header { flex-wrap: wrap; height: auto; min-height: 44px; padding: 5px 10px; gap: 5px; }
   #logo .logo-text { font-size: .78rem; }
   #run-controls { gap: 4px; }
   .btn-sm { padding: 4px 8px; font-size: .7rem; }
 
-  /* Main layout: stack vertically */
-  #main { flex-direction: column; }
-  #workspace-panel { width: 100% !important; height: 45vh; flex-shrink: 0; }
+  /* ── Mobile panel tab bar ── */
+  #mobile-panel-tabs {
+    display: flex;
+    flex-shrink: 0;
+    height: 50px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    z-index: 200;
+  }
+  .m-ptab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: .62rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 4px 0;
+    transition: color .15s, background .15s;
+    position: relative;
+  }
+  .m-ptab.active {
+    color: var(--primary);
+  }
+  .m-ptab.active::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 20%; right: 20%;
+    height: 2px;
+    background: var(--primary);
+    border-radius: 0 0 2px 2px;
+  }
+  .m-ptab svg { opacity: .7; }
+  .m-ptab.active svg { opacity: 1; }
+
+  /* ── Main layout: panels fill remaining height, switched by JS ── */
+  #main {
+    flex-direction: column;
+    height: calc(100dvh - var(--header-h) - 50px);
+    overflow: hidden;
+  }
+
+  /* Hide desktop dividers */
   .div-v { display: none; }
-  #right-col { width: 100% !important; height: 55vh; flex-direction: column; --row-split: 45vh; }
-  #sim-panel { height: var(--row-split); }
-  #bottom-panel { height: calc(55vh - var(--row-split) - 5px); }
-  .div-h { cursor: row-resize; }
+  .div-h { display: none; }
+
+  /* Each panel fills the available space; JS adds .m-active to show */
+  #workspace-panel {
+    width: 100% !important;
+    height: 100% !important;
+    flex-shrink: 0;
+    display: none;
+  }
+  #workspace-panel.m-active { display: flex; }
+
+  #right-col {
+    width: 100% !important;
+    height: 100% !important;
+    flex-direction: column;
+    flex-shrink: 0;
+    display: none;
+    --row-split: 50%;
+  }
+  #right-col.m-active { display: flex; }
+
+  /* Sub-panels within right-col: JS adds .m-subactive to show one */
+  #sim-panel    { display: none; flex: 1; height: auto !important; }
+  #bottom-panel { display: none; flex: 1; height: auto !important; }
+  #sim-panel.m-subactive    { display: flex; }
+  #bottom-panel.m-subactive { display: flex; }
+
+  /* Sim title: show icon + short "Sim" in place of full label */
+  .sim-title-text { display: none; }
 
   /* Sim panel header: allow wrapping */
   #sim-panel .panel-header { flex-wrap: wrap; gap: 4px; height: auto; padding: 4px 8px; }
   select#mat-select { max-width: 100px; font-size: .68rem; }
 
-  /* Workspace panel header: allow wrapping */
+  /* Workspace header: allow wrapping */
   #workspace-header { height: auto !important; min-height: 34px; flex-wrap: wrap; padding: 3px 8px; gap: 4px; }
 
   /* Code editor toolbar: allow wrapping */
   .code-toolbar { flex-wrap: wrap; }
 }
 
-/* Small phone portrait (≤ 480px) — hamburger menu + further compaction */
+/* ── Landscape phone override (≤ 700px wide AND landscape) ─────────────────── */
+@media (max-width: 700px) and (orientation: landscape) {
+  /* Shorter font & header for landscape */
+  html { font-size: 12.5px; }
+  :root { --header-h: 38px; }
+  #header { min-height: 38px; padding: 4px 10px; }
+
+  /* Shorter tab bar for landscape */
+  #mobile-panel-tabs { height: 38px; }
+  .m-ptab { font-size: .58rem; }
+  .m-ptab svg { width: 14px; height: 14px; }
+
+  /* Hide Blocks tab in landscape — workspace always visible */
+  .m-ptab[data-mpanel="workspace"] { display: none; }
+
+  #main {
+    flex-direction: row;
+    height: calc(100dvh - var(--header-h) - 38px);
+  }
+
+  /* In landscape: workspace is always visible (left), right-col always visible (right) */
+  #workspace-panel {
+    display: flex !important;
+    width: 50% !important;
+    height: 100% !important;
+  }
+  #right-col {
+    display: flex !important;
+    width: 50% !important;
+    height: 100% !important;
+  }
+}
+
+/* ── ≤ 480px (portrait phone) — hamburger + further compaction ──────────────── */
 @media (max-width: 480px) {
-  /* Show hamburger, collapse secondary header items */
+  /* Show hamburger button */
   .hamburger-btn { display: flex !important; }
 
-  /* #header-extra is hidden by default; .menu-open class reveals it */
+  /* header-extra hidden by default; .menu-open reveals it */
   #header-extra {
     display: none;
     width: 100%;
-    order: 10;          /* push below run/stop row */
+    order: 10;
     padding: 6px 2px 2px;
     border-top: 1px solid var(--border-light);
     flex-wrap: wrap;
     gap: 5px;
   }
   #header.menu-open #header-extra { display: flex; }
-
-  /* Header needs relative positioning for potential future dropdown */
   #header { position: relative; }
 
-  /* Tighten up run button labels */
-  #btn-save span, #btn-load span { display: none; }
-
-  /* Collapse logo text on very small screens */
+  /* Logo: hide text and GitHub link */
   .logo-text { display: none; }
   .logo-github-link { display: none; }
 
   /* Language selector narrower */
   #lang-select { width: 50px; font-size: .7rem; }
 
-  /* Project name fills available space in the extra row */
+  /* Project name fills row */
   #project-name { flex: 1; min-width: 80px; max-width: none; }
 
-  /* Workspace header: tighter layout */
-  #workspace-header { padding: 3px 6px; gap: 3px; }
-
-  /* Tabs: icon-only on phones — hide text labels */
+  /* Workspace tabs: icon-only */
   #ws-tabs .ptab span[data-i18n] { display: none; }
   #ws-tabs .ptab { padding: 4px 8px; }
   #btn-split-view { padding: 4px 6px; }
@@ -1724,19 +1830,20 @@ select, input { font-family: inherit; }
   /* Sample selector narrower */
   #sample-select { max-width: 80px; font-size: .66rem; }
 
-  /* Block tools: slightly smaller buttons */
+  /* Workspace tools: tighter */
+  #workspace-header { padding: 3px 6px; gap: 3px; }
   #ws-block-tools .btn-flat { padding: 3px 5px; }
 
-  /* Hide block count badge and redo to save space */
+  /* Hide less critical elements */
   .block-count-badge { display: none; }
   #btn-redo { display: none; }
 
-  /* Bottom panel: ensure it gets some height */
-  #bottom-panel { min-height: 120px; }
-
-  /* LLM toolbar: allow wrapping */
+  /* LLM toolbar wraps */
   #llm-toolbar { flex-wrap: wrap; }
 }
+
+/* Dark theme tab bar */
+[data-theme="dark"] #mobile-panel-tabs { background: var(--surface); border-top-color: var(--border); }
 
 /* ─── Card Scanner Modal ───────────────────────────────────────────────────── */
 .scanner-modal {
